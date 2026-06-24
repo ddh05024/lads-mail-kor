@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>러브앤딥스페이스 총공메일 | 6번째 남주 오인혁/敖尹/ロウガ/Valko</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500&family=Noto+Sans+SC:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #0d0d18;
+    --surface: #13131f;
+    --card: #1a1a2e;
+    --border: #2a2a4a;
+    --accent: #8b6fcb;
+    --accent-soft: #b89fdf;
+    --accent-glow: rgba(139,111,203,0.15);
+    --text: #e8e4f0;
+    --text-muted: #9490a8;
+    --text-dim: #5c5a70;
+    --danger: #c0415a;
+    --success: #4a9e7f;
+    --gold: #c9a84c;
+    --kr: #d45e6a;
+    --cn: #d47a3a;
+    --jp: #a03060;
+    --en: #3a7abf;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', 'Noto Sans SC', 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(139,111,203,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(93,63,160,0.08) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* 헤더 */
+  .site-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .tag-line {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent-soft);
+    border: 1px solid var(--accent);
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 18px;
+  }
+
+  .site-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: clamp(20px, 4vw, 30px);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.45;
+    margin-bottom: 10px;
+  }
+
+  .site-title span { color: var(--accent-soft); }
+
+  .name-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 16px 0 8px;
+  }
+
+  .name-badge {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  .name-badge.kr { background: rgba(212,94,106,0.15); color: #e8909a; border: 1px solid rgba(212,94,106,0.4); }
+  .name-badge.cn { background: rgba(212,122,58,0.15); color: #e8a87a; border: 1px solid rgba(212,122,58,0.4); }
+  .name-badge.jp { background: rgba(160,48,96,0.15); color: #d080a0; border: 1px solid rgba(160,48,96,0.4); }
+  .name-badge.en { background: rgba(58,122,191,0.15); color: #80b0df; border: 1px solid rgba(58,122,191,0.4); }
+
+  .site-desc { font-size: 13px; color: var(--text-muted); }
+
+  /* 공지 배너 */
+  .notice-banner {
+    background: linear-gradient(135deg, rgba(192,65,90,0.12), rgba(139,111,203,0.10));
+    border: 1px solid rgba(192,65,90,0.35);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 13px;
+    color: #e8a0ae;
+    margin-bottom: 36px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .notice-banner .icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+  /* 섹션 타이틀 */
+  .section-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent-soft);
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* 이메일 그리드 */
+  .email-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 10px;
+    margin-bottom: 40px;
+  }
+
+  .email-row {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transition: border-color 0.2s;
+  }
+  .email-row:hover { border-color: var(--accent); }
+  .email-info { display: flex; align-items: center; gap: 10px; }
+  .email-flag { font-size: 20px; }
+  .email-addr {
+    font-size: 12px;
+    color: var(--accent-soft);
+    font-family: 'Courier New', monospace;
+    word-break: break-all;
+  }
+  .copy-btn {
+    background: var(--accent-glow);
+    border: 1px solid var(--accent);
+    color: var(--accent-soft);
+    font-size: 11px;
+    font-family: 'Noto Sans KR', sans-serif;
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .copy-btn:hover { background: var(--accent); color: #fff; }
+  .copy-btn.copied { background: var(--success); border-color: var(--success); color: #fff; }
+
+  /* 언어 탭 */
+  .lang-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 0;
+    flex-wrap: wrap;
+  }
+
+  .lang-tab {
+    padding: 8px 18px;
+    border-radius: 10px 10px 0 0;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: 13px;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .lang-tab.active-kr { background: rgba(212,94,106,0.15); color: #e8909a; border-color: rgba(212,94,106,0.5); }
+  .lang-tab.active-cn { background: rgba(212,122,58,0.15); color: #e8a87a; border-color: rgba(212,122,58,0.5); }
+  .lang-tab.active-jp { background: rgba(160,48,96,0.15); color: #d080a0; border-color: rgba(160,48,96,0.5); }
+  .lang-tab.active-en { background: rgba(58,122,191,0.15); color: #80b0df; border-color: rgba(58,122,191,0.5); }
+
+  /* 메일 카드 */
+  .mail-section { margin-bottom: 40px; }
+
+  .mail-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 0 14px 14px 14px;
+    overflow: hidden;
+    display: none;
+  }
+  .mail-card.active { display: block; }
+
+  .mail-card-header {
+    padding: 18px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .mail-card-header.kr { background: linear-gradient(135deg, rgba(212,94,106,0.14), rgba(139,111,203,0.08)); }
+  .mail-card-header.cn { background: linear-gradient(135deg, rgba(212,122,58,0.14), rgba(139,111,203,0.08)); }
+  .mail-card-header.jp { background: linear-gradient(135deg, rgba(160,48,96,0.14), rgba(139,111,203,0.08)); }
+  .mail-card-header.en { background: linear-gradient(135deg, rgba(58,122,191,0.14), rgba(139,111,203,0.08)); }
+
+  .mail-lang-label {
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .subject-inline {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+
+  .copy-all-btn {
+    background: var(--accent);
+    border: none;
+    color: #fff;
+    font-size: 12px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 500;
+    padding: 7px 16px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .copy-all-btn:hover { background: var(--accent-soft); color: var(--bg); }
+  .copy-all-btn.copied { background: var(--success); }
+
+  .copy-subject-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-family: 'Noto Sans KR', sans-serif;
+    padding: 4px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .copy-subject-btn:hover { border-color: var(--accent); color: var(--accent-soft); }
+  .copy-subject-btn.copied { border-color: var(--success); color: var(--success); }
+
+  .mail-body {
+    padding: 30px 28px;
+    font-size: 13.5px;
+    line-height: 2;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: keep-all;
+  }
+  .mail-body.cn { font-family: 'Noto Sans SC', sans-serif; font-size: 13.5px; }
+  .mail-body.jp { font-family: 'Noto Sans JP', sans-serif; font-size: 13.5px; }
+  .mail-body.en { font-family: Georgia, 'Times New Roman', serif; font-size: 13.5px; line-height: 1.9; }
+
+  /* 가이드 */
+  .guide-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 22px;
+    margin-bottom: 40px;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.9;
+  }
+  .guide-card strong { color: var(--gold); font-weight: 500; }
+  .guide-card ul { list-style: none; padding-left: 4px; }
+  .guide-card ul li::before { content: '→ '; color: var(--accent); }
+
+  /* 토스트 */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--success);
+    color: #fff;
+    font-size: 13px;
+    font-family: 'Noto Sans KR', sans-serif;
+    padding: 10px 22px;
+    border-radius: 30px;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 999;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* 푸터 */
+  .footer {
+    text-align: center;
+    font-size: 11.5px;
+    color: var(--text-dim);
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    line-height: 1.9;
+  }
+
+  @media (max-width: 540px) {
+    .mail-body { padding: 20px 16px; font-size: 12.5px; }
+    .mail-card-header { padding: 14px 16px; }
+    .wrapper { padding: 28px 14px 60px; }
+    .lang-tab { font-size: 12px; padding: 7px 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- 헤더 -->
+  <div class="site-header">
+    <div class="tag-line">총공 메일 · Ver. 2026.06</div>
+    <h1 class="site-title">러브앤딥스페이스<br><span>6번째 남주 관련 공식 의견서</span></h1>
+    <div class="name-row">
+      <span class="name-badge kr">🇰🇷 오인혁</span>
+      <span class="name-badge cn">🇨🇳 敖尹 (Ao Yin)</span>
+      <span class="name-badge jp">🇯🇵 ロウガ (Rouga)</span>
+      <span class="name-badge en">🇺🇸 Valko</span>
+    </div>
+    <p class="site-desc">한국 유저들의 자발적인 의견을 담은 공식 건의서 · 4개 국어 번역 제공</p>
+  </div>
+
+  <!-- 공지 -->
+  <div class="notice-banner">
+    <span class="icon">⚠️</span>
+    <span>아래 이메일 주소와 메일 본문을 복사하여 발송해 주세요. 개인정보 미포함. 자유롭게 수정하여 사용하실 수 있습니다.</span>
+  </div>
+
+  <!-- 이메일 주소 -->
+  <div class="section-title">📬 발송 대상 이메일</div>
+  <div class="email-grid">
+    <div class="email-row">
+      <div class="email-info">
+        <span class="email-flag">🇰🇷</span>
+        <span class="email-addr">support-KR@infoldgames.com</span>
+      </div>
+      <button class="copy-btn" onclick="copyEmail(this,'support-KR@infoldgames.com')">복사</button>
+    </div>
+    <div class="email-row">
+      <div class="email-info">
+        <span class="email-flag">🇨🇳</span>
+        <span class="email-addr">support-tc@infoldgames.com</span>
+      </div>
+      <button class="copy-btn" onclick="copyEmail(this,'support-tc@infoldgames.com')">복사</button>
+    </div>
+    <div class="email-row">
+      <div class="email-info">
+        <span class="email-flag">🇯🇵</span>
+        <span class="email-addr">support-jp@infoldgames.com</span>
+      </div>
+      <button class="copy-btn" onclick="copyEmail(this,'support-jp@infoldgames.com')">복사</button>
+    </div>
+    <div class="email-row">
+      <div class="email-info">
+        <span class="email-flag">🇺🇸</span>
+        <span class="email-addr">support-EN@infoldgames.com</span>
+      </div>
+      <button class="copy-btn" onclick="copyEmail(this,'support-EN@infoldgames.com')">복사</button>
+    </div>
+  </div>
+
+  <!-- 사용 안내 -->
+  <div class="section-title">📋 사용 방법</div>
+  <div class="guide-card">
+    <ul>
+      <li><strong>STEP 1.</strong> 이메일 주소 복사 → 수신인란 붙여넣기 (전체 발송 권장)</li>
+      <li><strong>STEP 2.</strong> 원하는 언어 탭 선택 → 제목 복사 → 제목란 붙여넣기</li>
+      <li><strong>STEP 3.</strong> '본문 복사' 버튼 클릭 → 본문란 붙여넣기</li>
+      <li><strong>STEP 4.</strong> 필요 시 추가 의견을 자유롭게 덧붙인 후 발송</li>
+    </ul>
+  </div>
+
+  <!-- 메일 탭 + 본문 -->
+  <div class="section-title">📝 메일 본문 (언어 선택)</div>
+  <div class="mail-section">
+    <div class="lang-tabs">
+      <button class="lang-tab active-kr" onclick="switchLang('kr')" id="tab-kr">🇰🇷 한국어</button>
+      <button class="lang-tab" onclick="switchLang('cn')" id="tab-cn">🇨🇳 中文</button>
+      <button class="lang-tab" onclick="switchLang('jp')" id="tab-jp">🇯🇵 日本語</button>
+      <button class="lang-tab" onclick="switchLang('en')" id="tab-en">🇺🇸 English</button>
+    </div>
+
+    <!-- 한국어 -->
+    <div class="mail-card active" id="card-kr">
+      <div class="mail-card-header kr">
+        <div>
+          <div class="mail-lang-label" style="color:#e8909a;">🇰🇷 한국어 — 오인혁</div>
+          <div class="subject-inline">
+            <span id="subj-kr">[한국 유저 공식 건의] 6번째 남자 주인공 오인혁(Valko) 출시 방향 및 향후 운영에 관한 의견서</span>
+            <button class="copy-subject-btn" onclick="copySubject(this,'subj-kr')">제목 복사</button>
+          </div>
+        </div>
+        <button class="copy-all-btn" onclick="copyBody(this,'body-kr')">📋 본문 복사</button>
+      </div>
+      <div class="mail-body" id="body-kr">안녕하세요, 인폴드게임즈 운영팀 담당자분께.
+
+저는 「러브앤딥스페이스」를 서비스 초기부터 꾸준히 즐겨온 한국 유저입니다. 평소 게임의 높은 완성도와 깊이 있는 스토리텔링에 깊은 애정을 가지고 있기에, 이번 6번째 남자 주인공 오인혁(Valko) 공개와 관련하여 유저의 입장에서 진지한 의견을 전달드리고자 메일을 보내게 되었습니다.
+
+──────────────────────────────
+
+■ 1. 기존 남주인공들의 콘텐츠 완성도 선행 요청
+
+현재 기욱, 심성훈, 이서언, 진운, 하우주 다섯 남주인공들의 스토리와 콘텐츠가 여전히 완결되지 않은 상태입니다. 새로운 캐릭터를 추가하기 이전에, 기존 캐릭터들과의 서사를 보다 풍성하게 완성해 주시기를 강력히 요청드립니다.
+
+■ 2. 자원 분산에 따른 유저 부담 증가
+
+「러브앤딥스페이스」는 가챠(뽑기) 시스템을 기반으로 운영됩니다. 남주인공이 한 명 추가될 때마다 유저가 투자해야 하는 시간적·금전적 자원은 그에 비례하여 증가합니다. 이미 다섯 명의 남주인공을 온전히 육성하는 것만으로도 상당한 부담이 존재하는 상황에서, 6번째 캐릭터의 추가는 유저 이탈 및 과금 피로도를 심화시킬 수 있다는 점을 우려합니다. 신규 캐릭터 출시에 앞서 기존 유저의 자원 운용 부담을 경감할 수 있는 보상 체계 개선 또는 무료 획득 경로 확대를 병행해 주시기 바랍니다.
+
+■ 3. 세계관 정합성에 대한 의문
+
+오인혁(Valko)은 늑대 클랜의 수장이라는 설정으로 공개되었습니다. 「러브앤딥스페이스」는 근미래 SF 세계관을 기반으로 하며, 이볼(Evol) 능력 시스템과 유랑체라는 독자적인 설정 체계를 구축해 왔습니다. 그러나 이번 캐릭터의 늑대인간 설정은 기존 세계관과의 자연스러운 연결고리가 불명확하게 느껴집니다. 오인혁의 설정이 기존 세계관과 어떻게 연결되는지에 대한 명확한 공식 설명과 충분한 스토리 연계를 요청드립니다.
+
+■ 4. 비주얼 디자인 방향성에 대한 의견
+
+일부 유저들 사이에서는 오인혁의 외형 디자인, 특히 인간형 귀와 늑대 귀가 동시에 존재하는 형태에 대한 어색함이 지적되고 있습니다. 기존 남주인공들이 지닌 세련되고 현실감 있는 비주얼과의 이질감에 대한 우려의 목소리가 적지 않습니다. 향후 캐릭터 디자인 과정에서 유저 의견을 더욱 적극적으로 수렴해 주시기를 제안드립니다.
+
+■ 5. 서비스 지속 가능성에 대한 신뢰
+
+저희 유저들이 이 메일을 보내는 가장 근본적인 이유는, 이 게임을 오래도록 함께하고 싶기 때문입니다. 무리한 확장보다는, 지금 함께하는 유저들이 더 오래, 더 깊이 게임을 즐길 수 있는 운영 방향을 우선적으로 고려해 주시기를 간곡히 부탁드립니다.
+
+──────────────────────────────
+
+위 의견들은 게임에 대한 깊은 애정에서 비롯된 것으로, 불만 표출이 아닌 건설적인 소통을 목적으로 합니다. 부디 한국 유저들의 목소리를 귀 기울여 들어 주시고, 향후 운영 방향에 반영해 주시기를 진심으로 바랍니다.
+
+감사합니다.
+「러브앤딥스페이스」 한국 유저 일동</div>
+    </div>
+
+    <!-- 중국어 -->
+    <div class="mail-card" id="card-cn">
+      <div class="mail-card-header cn">
+        <div>
+          <div class="mail-lang-label" style="color:#e8a87a;">🇨🇳 中文 — 敖尹 (Ao Yin)</div>
+          <div class="subject-inline">
+            <span id="subj-cn">【玩家正式建议】关于第六位男主角敖尹(Valko)发布方向及后续运营的意见书</span>
+            <button class="copy-subject-btn" onclick="copySubject(this,'subj-cn')">复制标题</button>
+          </div>
+        </div>
+        <button class="copy-all-btn" onclick="copyBody(this,'body-cn')">📋 复制正文</button>
+      </div>
+      <div class="mail-body cn" id="body-cn">敬启者，Infold Games 运营团队：
+
+您好！我是一名从游戏上线初期便一直坚持游玩《恋与深空》的玩家。正因为对这款游戏的高质量完成度和深度叙事有着深厚的喜爱，在此次第六位男主角敖尹（Valko）公开发布之际，我希望以玩家的身份郑重地向运营方传达以下意见。
+
+──────────────────────────────
+
+■ 一、请优先完善现有男主角的内容质量
+
+目前，祁煜、黎深、沈星回、晋云、夏以昼五位男主角的故事线与内容仍处于未完结状态。我们强烈建议，在新增角色之前，应先将现有角色的剧情与周边内容充实完善。
+
+■ 二、新增角色带来的资源分散问题
+
+《恋与深空》以抽卡（祈愿）系统为核心运营。每新增一位男主角，玩家所需投入的时间与金钱成本便会随之成比例增加。在仅培育现有五位男主角已承受相当压力的情况下，第六位角色的加入可能进一步加剧玩家流失及付费疲劳。我们恳请在推出新角色的同时，相应优化奖励体系，或扩大免费获取渠道，以减轻老玩家的负担。
+
+■ 三、对世界观一致性的疑问
+
+敖尹（Valko）以狼族首领的身份登场。《恋与深空》长期以近未来科幻为世界观框架，构建了Evol能力系统与流浪体等独特设定体系。然而，此次角色的狼人设定与既有世界观之间的关联逻辑尚不清晰。我们请求官方提供明确说明，阐释敖尹的设定如何与现有世界观有机衔接，并配合充足的剧情铺垫。
+
+■ 四、关于视觉设计方向的意见
+
+部分玩家对敖尹的外形设计存有异议，尤其是人类耳与狼耳同时呈现的造型引发了较大争议。现有男主角均以精致而贴近现实的美型风格为特色，此番设计在视觉上存在明显割裂感。建议在今后的角色设计过程中，更积极地吸纳玩家反馈，并在正式公布前开设预览意见收集渠道。
+
+■ 五、关于游戏长期运营可持续性的期望
+
+我们写下这封信，最根本的原因是希望能与这款游戏长久相伴。我们理解新增角色是游戏持续发展的必要手段，但也请铭记：游戏的根基，是现有玩家的信任与热爱。比起贸然扩张，我们更希望运营方优先考虑如何让当下的玩家玩得更久、更深入。
+
+──────────────────────────────
+
+以上意见源自对游戏的深切热爱，旨在建设性的沟通，而非单纯的抱怨与宣泄。恳请认真倾听玩家的声音，并将其纳入今后的运营方向之中。
+
+谢谢您的阅读。
+《恋与深空》玩家 敬上</div>
+    </div>
+
+    <!-- 일본어 -->
+    <div class="mail-card" id="card-jp">
+      <div class="mail-card-header jp">
+        <div>
+          <div class="mail-lang-label" style="color:#d080a0;">🇯🇵 日本語 — ロウガ (Rouga)</div>
+          <div class="subject-inline">
+            <span id="subj-jp">【プレイヤー公式要望】第6番目の男性主人公ロウガ(Valko)のリリース方針および今後の運営に関する意見書</span>
+            <button class="copy-subject-btn" onclick="copySubject(this,'subj-jp')">件名コピー</button>
+          </div>
+        </div>
+        <button class="copy-all-btn" onclick="copyBody(this,'body-jp')">📋 本文コピー</button>
+      </div>
+      <div class="mail-body jp" id="body-jp">Infold Games 運営チームご担当者様へ
+
+私はサービス開始当初から『恋と深空』を継続してプレイしているユーザーです。ゲームの高い完成度と深みのあるストーリーテリングに強い愛着を持っているからこそ、このたびの第6番目の男性主人公ロウガ（Valko）の発表を受け、プレイヤーとして誠実な意見をお伝えしたいと思い、このメールをお送りいたします。
+
+──────────────────────────────
+
+■ 1. 既存の男性主人公のコンテンツ充実を優先してください
+
+現在、祈煜、黎深、沈星回、晋雲、夏以昼の5名の男性主人公のストーリーとコンテンツはいまだ完結していない状態にあります。新たなキャラクターを追加する前に、まず既存キャラクターとの物語をより豊かに完成させていただくよう強くお願い申し上げます。
+
+■ 2. リソース分散によるプレイヤー負担の増大
+
+『恋と深空』はガチャシステムを基盤として運営されています。男性主人公が1人追加されるたびに、プレイヤーが投資しなければならない時間的・金銭的コストはそれに比例して増加します。5名の主人公をすでに育成するだけでも相当な負担がある中、6人目の追加はプレイヤーの離脱と課金疲弊をさらに深刻化させる懸念があります。新キャラクターのリリースにあたっては、既存ユーザーの資産負担を軽減できる報酬体系の改善や、無料入手経路の拡充を同時に進めていただければ幸いです。
+
+■ 3. 世界観の整合性への疑問
+
+ロウガ（Valko）はウルフ族のリーダーとして公開されました。『恋と深空』はニアフューチャーのSF世界観を基盤とし、Evol能力システムやワンダラーという独自の設定体系を構築してきました。しかし今回のウェアウルフ設定は、既存の世界観との自然なつながりが不明瞭に感じられます。ロウガの設定が既存の世界観にどのように接続されるのか、明確な公式説明と十分なストーリー上の伏線を追加していただくようお願いいたします。
+
+■ 4. ビジュアルデザインの方向性についての意見
+
+一部のプレイヤーの間では、ロウガの外見デザイン、特に人間の耳と狼の耳が同時に存在する形状に違和感を感じる声が上がっています。既存の男性主人公たちが持つ洗練されたリアリスティックなビジュアルとの乖離に懸念を示す声も少なくありません。今後のキャラクターデザインにおいては、プレイヤーの意見をより積極的に取り入れ、事前フィードバックの場を設けていただくことをご提案いたします。
+
+■ 5. 長期サービス継続への信頼
+
+私たちがこのメールを送る最も根本的な理由は、このゲームと長く共にありたいという思いからです。拙速な拡張よりも、今ともにプレイしているユーザーたちがより長く、より深くゲームを楽しめる運営方針を優先的にご検討いただきますよう、心よりお願い申し上げます。
+
+──────────────────────────────
+
+以上の意見は、ゲームへの深い愛情から生まれたものであり、不満の発散ではなく建設的なコミュニケーションを目的としております。どうかプレイヤーの声に真摯に耳を傾けていただき、今後の運営方針に反映していただけますよう、よろしくお願いいたします。
+
+ありがとうございました。
+『恋と深空』プレイヤー一同より</div>
+    </div>
+
+    <!-- 영어 -->
+    <div class="mail-card" id="card-en">
+      <div class="mail-card-header en">
+        <div>
+          <div class="mail-lang-label" style="color:#80b0df;">🇺🇸 English — Valko</div>
+          <div class="subject-inline">
+            <span id="subj-en">[Official Player Feedback] Statement on the Release Direction of the 6th Love Interest Valko and Future Game Operations</span>
+            <button class="copy-subject-btn" onclick="copySubject(this,'subj-en')">Copy Subject</button>
+          </div>
+        </div>
+        <button class="copy-all-btn" onclick="copyBody(this,'body-en')">📋 Copy Body</button>
+      </div>
+      <div class="mail-body en" id="body-en">Dear Infold Games Support Team,
+
+I am a player who has been enjoying Love and Deepspace since the game's early days. Out of genuine love for the game's exceptional quality and immersive storytelling, I am writing this letter to share sincere feedback as a player following the official reveal of the 6th Love Interest, Valko.
+
+──────────────────────────────
+
+■ 1. Please Prioritize Completing Existing Love Interest Content First
+
+The storylines and content for the five existing Love Interests — Rafayel, Zayne, Xavier, Sylus, and Caleb — remain incomplete. We strongly urge the development team to focus on enriching and concluding existing characters' narratives before introducing a new one.
+
+■ 2. Increased Player Burden Due to Resource Dilution
+
+Love and Deepspace operates on a gacha (Wish) system. Each new Love Interest added to the game proportionally increases the time and financial investment required from players. With supporting five Love Interests already placing significant strain on our resources, the addition of a sixth character risks deepening player burnout and gacha fatigue. We ask that the launch of any new character be accompanied by meaningful improvements to the reward system or expanded free-to-play acquisition routes to ease the burden on existing players.
+
+■ 3. Concerns About World-Building Consistency
+
+Valko has been introduced as the leader of a werewolf clan. Love and Deepspace has built its identity around a near-future sci-fi setting, complete with the Evol ability system and Wanderers as its unique narrative framework. The werewolf mythology surrounding Valko feels disconnected from the established lore. We request a clear and thorough official explanation of how Valko's nature fits within the existing world, supported by adequate in-game story groundwork.
+
+■ 4. Feedback on Visual Design Direction
+
+A number of players have expressed discomfort with Valko's character design — particularly the presence of both human and wolf ears simultaneously. The existing Love Interests are defined by refined, grounded, and realistic aesthetics, and this design divergence has drawn concern from a notable portion of the community. We encourage the development team to actively incorporate player feedback into future character design processes, and to consider offering preview opportunities before official reveals.
+
+■ 5. Trust in the Longevity of This Game
+
+The core reason we are sending this letter is simple: we want to stay with this game for a long time. While we understand that introducing new characters is a natural part of the game's growth, we ask that you never lose sight of the trust and affection that your current player base has built this game upon. We hope that thoughtful, sustainable development — rather than rapid expansion — will be the guiding principle going forward.
+
+──────────────────────────────
+
+The opinions expressed above come from a place of deep affection for this game. This is not a complaint, but an earnest attempt at constructive communication. We sincerely hope that you will listen to the voices of your players and reflect them in the future direction of Love and Deepspace.
+
+Thank you sincerely for your time.
+Love and Deepspace Players</div>
+    </div>
+  </div>
+
+  <!-- 푸터 -->
+  <div class="footer">
+    본 건의서는 한국 유저들의 자발적인 총공 활동을 위해 제작되었습니다.<br>
+    개인정보 미포함 · 4개국어 (한/중/일/영) · 자유롭게 공유 및 수정 가능 · 2026.06
+  </div>
+
+</div>
+
+<!-- 토스트 -->
+<div class="toast" id="toast">✓ 클립보드에 복사되었습니다</div>
+
+<script>
+  const langs = ['kr','cn','jp','en'];
+
+  function switchLang(lang) {
+    langs.forEach(l => {
+      document.getElementById('card-' + l).classList.remove('active');
+      const tab = document.getElementById('tab-' + l);
+      tab.className = 'lang-tab';
+    });
+    document.getElementById('card-' + lang).classList.add('active');
+    document.getElementById('tab-' + lang).classList.add('active-' + lang);
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg || '✓ 복사되었습니다';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  function copyEmail(btn, email) {
+    navigator.clipboard.writeText(email).then(() => {
+      btn.textContent = '✓ 복사됨';
+      btn.classList.add('copied');
+      showToast('이메일 주소가 복사되었습니다');
+      setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  function copySubject(btn, id) {
+    const text = document.getElementById(id).textContent.trim();
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.textContent;
+      btn.classList.add('copied');
+      btn.textContent = '✓';
+      showToast('메일 제목이 복사되었습니다');
+      setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  function copyBody(btn, id) {
+    const text = document.getElementById(id).textContent.trim();
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = '✓ 복사 완료!';
+      btn.classList.add('copied');
+      showToast('✓ 본문이 복사되었습니다');
+      setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2500);
+    });
+  }
+
+  // 초기 탭 세팅
+  document.getElementById('tab-kr').classList.add('active-kr');
+</script>
+</body>
+</html>
