@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<!--
+  드림주 카드 메이커 (Love and Deepspace fan template) — 2가지 버전(페어 / 프로필)
+  - 100% 클라이언트 측에서 동작합니다. 입력값/사진은 어떤 서버로도 전송되지 않습니다.
+  - 외부 통신은 폰트/이미지 저장 라이브러리(CDN)뿐입니다.
+-->
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+<title>드림주 카드 메이커</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root{
+    --accent:#9B8CE0; --accent-rgb:155,140,224;
+    --bg:#07060f; --panel:rgba(22,20,38,0.62); --panel-line:rgba(255,255,255,0.10);
+    --ink:#f5f2fb; --muted:#a39fbb;
+    --serif:"Nanum Myeongjo","Gowun Batang",serif;
+    --sans:"Pretendard",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; padding:0; }
+  body{ font-family:var(--sans); color:var(--ink); background:var(--bg); min-height:100vh; overflow-x:hidden; position:relative; }
+
+  .sky{ position:fixed; inset:0; z-index:-2; transition:background 900ms ease; background:
+      radial-gradient(120% 80% at 80% -10%, rgba(var(--accent-rgb),0.30), transparent 60%),
+      radial-gradient(90% 70% at 0% 110%, rgba(var(--accent-rgb),0.16), transparent 55%),
+      radial-gradient(60% 50% at 50% 50%, rgba(120,90,200,0.10), transparent 70%), #07060f; }
+  .stars{ position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.7; animation:twinkle 6s ease-in-out infinite alternate; background-repeat:no-repeat;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%,#fff,transparent),radial-gradient(1px 1px at 75% 20%,#cfd8ff,transparent),
+      radial-gradient(1px 1px at 40% 70%,#fff,transparent),radial-gradient(1px 1px at 90% 60%,#fff,transparent),
+      radial-gradient(1.4px 1.4px at 60% 85%,#e7e0ff,transparent),radial-gradient(1px 1px at 12% 88%,#fff,transparent),
+      radial-gradient(1px 1px at 55% 12%,#fff,transparent); }
+  @keyframes twinkle{ from{opacity:.4} to{opacity:.8} }
+
+  .wrap{ max-width:430px; margin:0 auto; padding:20px 16px 56px; }
+  .masthead{ text-align:center; margin:4px 0 14px; }
+  .eyebrow{ font-size:11px; letter-spacing:.34em; text-transform:uppercase; color:var(--muted); font-weight:600; }
+  .masthead h1{ font-family:var(--serif); font-weight:800; font-size:25px; margin:.3em 0 .12em; }
+  .masthead p{ margin:0; color:var(--muted); font-size:12.5px; }
+
+  /* mode toggle */
+  .modeseg{ display:flex; gap:6px; background:rgba(255,255,255,.04); border:1px solid var(--panel-line); border-radius:14px; padding:5px; margin:0 0 14px; }
+  .modeseg button{ flex:1; border:none; background:transparent; color:var(--muted); font-family:var(--sans); font-weight:700; font-size:14px; padding:11px; border-radius:10px; cursor:pointer; transition:all .2s; }
+  .modeseg button[aria-pressed="true"]{ background:rgba(var(--accent-rgb),.22); color:var(--ink); box-shadow:0 0 0 1px rgba(var(--accent-rgb),.5); }
+
+  .mode{ display:none; }
+  .mode.active{ display:block; }
+
+  /* lead selector (페어) */
+  .leadbar{ display:flex; gap:8px; overflow-x:auto; padding:2px 2px 12px; scrollbar-width:none; }
+  .leadbar::-webkit-scrollbar{ display:none; }
+  .lead-pill{ flex:0 0 auto; border:1px solid var(--panel-line); background:rgba(255,255,255,.04); color:var(--ink); padding:9px 14px; border-radius:999px; font-size:13.5px; font-weight:600; cursor:pointer; transition:all .25s; white-space:nowrap; display:flex; align-items:center; gap:7px; }
+  .lead-pill .dot{ width:9px; height:9px; border-radius:50%; }
+  .lead-pill small{ color:var(--muted); font-weight:500; font-size:10.5px; }
+  .lead-pill[aria-selected="true"]{ border-color:rgba(var(--accent-rgb),.9); background:rgba(var(--accent-rgb),.18); }
+
+  /* ===== shared card shell ===== */
+  .card-stage{ margin:4px 0 16px; }
+  .card{ position:relative; width:100%; border-radius:22px; overflow:hidden; isolation:isolate; background:#100e1d; border:1px solid rgba(var(--accent-rgb),0.5); box-shadow:0 18px 50px rgba(0,0,0,.55); transition:border-color .5s ease; }
+  .card-bg{ position:absolute; inset:0; z-index:0; background-size:cover; background-position:center; }
+  .card-tint{ position:absolute; inset:0; z-index:1; transition:background .5s ease; background:
+      linear-gradient(166deg, rgba(var(--accent-rgb),0.52) 0%, rgba(var(--accent-rgb),0.11) 36%, rgba(8,7,16,0.88) 100%); }
+  .card-dark{ position:absolute; inset:0; z-index:1; background:#06050d; opacity:0; transition:opacity .25s; }
+  .card-eyebrow{ text-align:center; font-size:.62em; letter-spacing:.3em; text-transform:uppercase; color:rgba(255,255,255,.78); font-weight:700; }
+  .avatar{ border-radius:50%; position:relative; cursor:pointer; overflow:hidden; border:2px solid rgba(var(--accent-rgb),0.9); background:rgba(255,255,255,.06); background-size:cover; background-position:center; box-shadow:0 6px 18px rgba(0,0,0,.4); flex:0 0 auto; }
+  .avatar .ph{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; color:rgba(255,255,255,.82); font-weight:600; }
+  .rule{ height:1px; background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.7),transparent); }
+  .card-foot{ display:flex; align-items:center; justify-content:center; gap:.5em; color:rgba(255,255,255,.5); text-transform:uppercase; }
+  .card-foot .s{ background:rgba(255,255,255,.7); transform:rotate(45deg); }
+  [contenteditable]{ outline:none; }
+  .f-del{ border:none; background:rgba(255,255,255,.10); color:#fff; line-height:1; cursor:pointer; padding:0; border-radius:50%; }
+  .f-del:hover{ background:rgba(255,80,90,.6); }
+  .add-field{ width:100%; cursor:pointer; border:1px dashed rgba(var(--accent-rgb),.6); background:rgba(var(--accent-rgb),.10); color:#fff; font-weight:600; font-family:var(--sans); }
+
+  /* ===== MODE A : 페어 카드 (content height) ===== */
+  #cardA .card-inner{ position:relative; z-index:2; padding:26px 22px 22px; }
+  #cardA .card-eyebrow{ font-size:10.5px; }
+  #cardA .duo{ display:flex; align-items:center; justify-content:center; margin:16px 0 6px; }
+  #cardA .avatar{ width:92px; height:92px; }
+  #cardA .avatar.lead{ margin-left:-14px; }
+  #cardA .avatar .ph{ font-size:10.5px; }
+  #cardA .avatar .ph svg{ width:20px; height:20px; opacity:.85; }
+  #cardA .link-star{ width:54px; position:relative; display:flex; align-items:center; justify-content:center; }
+  #cardA .link-star .line{ position:absolute; left:0; right:0; height:1px; top:50%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent); }
+  #cardA .link-star .star{ width:12px; height:12px; transform:rotate(45deg); background:#fff; border-radius:2px; box-shadow:0 0 12px rgba(255,255,255,.9),0 0 22px rgba(var(--accent-rgb),.9); z-index:1; }
+  #cardA .pair-title{ text-align:center; font-family:var(--serif); font-weight:800; font-size:24px; line-height:1.25; margin:10px 4px 4px; text-shadow:0 2px 14px rgba(0,0,0,.5); }
+  #cardA .pair-sym{ color:rgba(var(--accent-rgb),1); margin:0 .28em; }
+  #cardA .pair-title .ce:empty:before{ content:attr(data-ph); color:rgba(255,255,255,.4); }
+  #cardA .card-sub{ text-align:center; color:rgba(255,255,255,.72); font-size:11.5px; letter-spacing:.05em; margin-bottom:14px; }
+  #cardA .card-sub:empty:before{ content:attr(data-ph); color:rgba(255,255,255,.34); }
+  #cardA .rule{ margin:4px 0 16px; }
+  #cardA .field{ position:relative; padding:10px 30px 10px 0; border-bottom:1px solid rgba(255,255,255,.08); }
+  #cardA .field:last-of-type{ border-bottom:none; }
+  #cardA .f-label{ display:block; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; font-weight:700; color:rgba(var(--accent-rgb),1); }
+  #cardA .f-val{ display:block; font-family:var(--serif); font-size:16px; line-height:1.5; color:#fbf9ff; margin-top:3px; word-break:break-word; min-height:1.4em; }
+  #cardA .f-val:empty:before{ content:attr(data-ph); color:rgba(255,255,255,.3); }
+  #cardA .f-del{ position:absolute; right:0; top:10px; width:22px; height:22px; font-size:12px; }
+  #cardA .add-field{ margin-top:14px; padding:11px; border-radius:12px; font-size:13px; }
+  #cardA .card-foot{ margin-top:18px; font-size:10px; letter-spacing:.28em; }
+  #cardA .card-foot .s{ width:4px; height:4px; }
+
+  /* ===== MODE B : 드림주 프로필 (9:16 auto-fit) ===== */
+  #cardB{ aspect-ratio:9/16; }
+  #cardB .card-inner{ position:absolute; inset:0; z-index:2; padding:5.2% 5.6%; overflow:hidden; display:flex; flex-direction:column; font-size:calc(16px * var(--fs,1)); }
+  #cardB .avatar{ width:5.4em; height:5.4em; margin:.7em auto .4em; }
+  #cardB .avatar .ph{ font-size:.6em; }
+  #cardB .avatar .ph svg{ width:1.6em; height:1.6em; opacity:.85; }
+  #cardB .dream-name{ text-align:center; font-family:var(--serif); font-weight:800; font-size:1.7em; line-height:1.15; margin:.1em .2em 0; text-shadow:0 2px 14px rgba(0,0,0,.5); }
+  #cardB .dream-name:empty:before{ content:attr(data-ph); color:rgba(255,255,255,.4); }
+  #cardB .tagline{ text-align:center; font-family:var(--serif); font-style:italic; font-size:.84em; color:rgba(255,255,255,.82); margin:.35em .4em .2em; }
+  #cardB .tagline:empty:before{ content:attr(data-ph); color:rgba(255,255,255,.34); font-style:italic; }
+  #cardB .rule{ margin:.7em 0 .55em; }
+  #cardB .field{ position:relative; display:flex; align-items:baseline; gap:.45em; padding:.2em 1.4em .2em 0; line-height:1.4; }
+  #cardB .f-label{ flex:0 0 auto; max-width:42%; font-size:.74em; font-weight:700; color:rgba(var(--accent-rgb),1); white-space:nowrap; }
+  #cardB .f-label:before{ content:"◆ "; }
+  #cardB .f-label:after{ content:":"; color:rgba(255,255,255,.5); margin-left:.05em; }
+  #cardB .f-val{ flex:1 1 auto; font-family:var(--serif); font-size:.92em; color:#fbf9ff; word-break:break-word; min-width:1em; }
+  #cardB .f-val:empty:before{ content:"-"; color:rgba(255,255,255,.32); }
+  #cardB .f-del{ position:absolute; right:0; top:.15em; width:1.25em; height:1.25em; font-size:.62em; }
+  #cardB .add-field{ margin:.5em 0 0; padding:.5em; border-radius:.7em; font-size:.72em; }
+  #cardB .sec-h{ font-size:.74em; font-weight:700; color:rgba(var(--accent-rgb),1); margin:.8em 0 .45em; }
+  #cardB .sec-h:before{ content:"◆ "; }
+  #cardB .rel-row{ display:flex; align-items:flex-start; gap:.5em; padding:.22em 0; line-height:1.4; }
+  #cardB .rel-chip{ flex:0 0 auto; font-size:.66em; font-weight:700; color:#fff; padding:.28em .7em; border-radius:.8em; white-space:nowrap; text-shadow:0 1px 2px rgba(0,0,0,.45); box-shadow:0 2px 8px rgba(0,0,0,.3); }
+  #cardB .rel-desc{ flex:1 1 auto; font-family:var(--serif); font-size:.82em; color:#f3eefb; word-break:break-word; padding-top:.12em; min-width:1em; }
+  #cardB .rel-desc:empty:before{ content:attr(data-ph); color:rgba(255,255,255,.32); }
+  #cardB .card-foot{ margin-top:auto; padding-top:.7em; font-size:.55em; letter-spacing:.26em; }
+  #cardB .card-foot .s{ width:.32em; height:.32em; }
+
+  /* actions / settings */
+  .actions{ display:flex; gap:10px; margin:4px 0 14px; }
+  .btn{ flex:1; padding:14px; border-radius:14px; border:none; cursor:pointer; font-weight:700; font-size:14px; font-family:var(--sans); display:flex; align-items:center; justify-content:center; gap:7px; transition:transform .12s, filter .2s; }
+  .btn:active{ transform:translateY(1px); }
+  .btn-primary{ background:linear-gradient(135deg, rgba(var(--accent-rgb),1), rgba(var(--accent-rgb),.72)); color:#0b0a16; }
+  .btn-x{ background:#000; color:#fff; border:1px solid rgba(255,255,255,.22); }
+  .btn svg{ width:17px; height:17px; }
+  details.cfg{ border:1px solid var(--panel-line); border-radius:16px; background:var(--panel); padding:0 14px; }
+  details.cfg summary{ list-style:none; cursor:pointer; padding:14px 2px; font-weight:600; font-size:14px; display:flex; align-items:center; gap:9px; }
+  details.cfg summary::-webkit-details-marker{ display:none; }
+  details.cfg summary .chev{ margin-left:auto; transition:transform .25s; color:var(--muted); }
+  details.cfg[open] summary .chev{ transform:rotate(180deg); }
+  .cfg-body{ padding:4px 2px 16px; }
+  .cfg-sec{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:700; margin:14px 0 8px; }
+  .color-row{ display:flex; align-items:center; gap:10px; padding:7px 0; }
+  .color-row .nm{ flex:1; font-size:13.5px; }
+  .color-row .nm small{ color:var(--muted); margin-left:6px; font-size:11px; }
+  .color-row input[type=color]{ width:38px; height:30px; border:none; background:none; padding:0; border-radius:8px; cursor:pointer; }
+  .opt-row{ display:flex; align-items:center; gap:12px; padding:9px 0; font-size:13.5px; }
+  .opt-row .k{ flex:1; }
+  .mini{ border:1px solid var(--panel-line); background:rgba(255,255,255,.05); color:var(--ink); border-radius:9px; padding:7px 12px; cursor:pointer; font-family:var(--sans); font-size:13px; }
+  .seg{ display:flex; gap:6px; }
+  .seg button{ border:1px solid var(--panel-line); background:rgba(255,255,255,.05); color:var(--ink); border-radius:9px; padding:6px 11px; cursor:pointer; font-size:14px; font-family:var(--sans); }
+  .seg button[aria-pressed="true"]{ background:rgba(var(--accent-rgb),.22); border-color:rgba(var(--accent-rgb),.8); }
+  input[type=range]{ flex:1; accent-color:rgba(var(--accent-rgb),1); }
+  .ghost{ width:100%; margin-top:14px; padding:10px; border-radius:11px; cursor:pointer; font-size:12.5px; border:1px solid var(--panel-line); background:transparent; color:var(--muted); font-family:var(--sans); }
+  .note{ text-align:center; color:var(--muted); font-size:11px; line-height:1.6; margin-top:18px; }
+  .toast{ position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); background:rgba(20,18,34,.96); color:#fff; padding:13px 18px; border-radius:12px; font-size:13px; border:1px solid rgba(var(--accent-rgb),.5); box-shadow:0 10px 30px rgba(0,0,0,.5); opacity:0; pointer-events:none; transition:opacity .3s, transform .3s; max-width:88%; text-align:center; z-index:99; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  .file-hidden{ position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
+  .exporting .no-export{ display:none !important; }
+  @media (prefers-reduced-motion: reduce){ .stars{ animation:none; } *{ transition:none !important; } }
+</style>
+</head>
+<body>
+<div class="sky"></div>
+<div class="stars"></div>
+
+<div class="wrap">
+  <header class="masthead">
+    <div class="eyebrow">Love and Deepspace</div>
+    <h1>드림주 카드 메이커</h1>
+    <p>카드 종류를 골라 채우고, 이미지로 저장해 공유하세요.</p>
+  </header>
+
+  <div class="modeseg" role="tablist">
+    <button id="tabA" role="tab" aria-pressed="false">페어 카드</button>
+    <button id="tabB" role="tab" aria-pressed="true">드림주 프로필</button>
+  </div>
+
+  <!-- ===== MODE A : 페어 카드 ===== -->
+  <section class="mode" id="modeA">
+    <div class="leadbar" id="leadbar" role="tablist" aria-label="남주 선택"></div>
+    <div class="card-stage">
+      <div class="card" id="cardA">
+        <div class="card-bg" id="cardBgA"></div>
+        <div class="card-tint"></div>
+        <div class="card-dark" id="cardDarkA"></div>
+        <div class="card-inner">
+          <div class="card-eyebrow">Dream <span id="ebSymA">✕</span> <span id="ebLeadA">Xavier</span></div>
+          <div class="duo">
+            <div class="avatar dream" id="avDreamA" role="button" aria-label="드림주 사진 추가">
+              <div class="ph no-export"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>드림주</div>
+            </div>
+            <div class="link-star"><div class="line"></div><div class="star"></div></div>
+            <div class="avatar lead" id="avLeadA" role="button" aria-label="남주 사진 추가">
+              <div class="ph no-export"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>남주</div>
+            </div>
+          </div>
+          <div class="pair-title"><span class="ce" id="dreamNameA" contenteditable="true" data-ph="드림주 이름" spellcheck="false"></span><span class="pair-sym" id="symMidA">✕</span><span id="leadNameA">심성훈</span></div>
+          <div class="card-sub" id="cardSubA" contenteditable="true" data-ph="한 줄 소개 (선택)" spellcheck="false"></div>
+          <div class="rule"></div>
+          <div class="fields" id="fieldsA"></div>
+          <button class="add-field no-export" id="addFieldA">＋ 항목 추가</button>
+          <div class="card-foot"><span class="s"></span> Love and Deepspace <span class="s"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MODE B : 드림주 프로필 ===== -->
+  <section class="mode active" id="modeB">
+    <div class="card-stage">
+      <div class="card" id="cardB">
+        <div class="card-bg" id="cardBgB"></div>
+        <div class="card-tint"></div>
+        <div class="card-dark" id="cardDarkB"></div>
+        <div class="card-inner" id="cardInnerB">
+          <div class="card-eyebrow">Dream · Profile</div>
+          <div class="avatar" id="avDreamB" role="button" aria-label="드림주 사진 추가">
+            <div class="ph no-export"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>드림주</div>
+          </div>
+          <div class="dream-name" id="dreamNameB" contenteditable="true" data-ph="이름" spellcheck="false"></div>
+          <div class="tagline" id="taglineB" contenteditable="true" data-ph="한마디" spellcheck="false"></div>
+          <div class="rule"></div>
+          <div class="fields" id="fieldsB"></div>
+          <button class="add-field no-export" id="addFieldB">＋ 항목 추가</button>
+          <div class="sec-h">관계 서술</div>
+          <div class="rel" id="relB"></div>
+          <div class="card-foot"><span class="s"></span> Love and Deepspace <span class="s"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="saveBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>이미지 저장</button>
+    <button class="btn btn-x" id="shareBtn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.66l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231zm-1.161 17.52h1.833L7.084 4.126H5.117l11.966 15.644z"/></svg>X에 공유</button>
+  </div>
+
+  <details class="cfg">
+    <summary><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.6-2-3.4-2.3 1a7 7 0 0 0-1.7-1L16.5 3h-4l-.4 2.3a7 7 0 0 0-1.7 1l-2.3-1-2 3.4 2 1.6a7 7 0 0 0 0 2l-2 1.6 2 3.4 2.3-1a7 7 0 0 0 1.7 1l.4 2.4h4l.4-2.4a7 7 0 0 0 1.7-1l2.3 1 2-3.4-2-1.6a7 7 0 0 0 .1-1z"/></svg>색 · 배경 설정<span class="chev">⌄</span></summary>
+    <div class="cfg-body">
+      <div class="cfg-sec">드림주 메인 컬러 (프로필 카드)</div>
+      <div class="color-row"><span class="nm">카드 테마</span><input type="color" id="drimColor" value="#9B8CE0"></div>
+
+      <div class="cfg-sec">남주별 컬러</div>
+      <div id="colorList"></div>
+
+      <div class="cfg-sec">이름 사이 기호 (페어 카드)</div>
+      <div class="opt-row"><div class="seg" id="symSeg">
+        <button type="button" data-sym="✕" aria-pressed="true">✕</button>
+        <button type="button" data-sym="♡">♡</button>
+        <button type="button" data-sym="·">·</button>
+        <button type="button" data-sym="&">&amp;</button>
+      </div></div>
+
+      <div class="cfg-sec">배경 (두 카드 공통)</div>
+      <div class="opt-row"><span class="k">배경 이미지</span><button type="button" class="mini" id="bgAddBtn">사진 선택</button><button type="button" class="ghost" id="bgClearBtn" style="width:auto;margin:0;padding:7px 12px;">제거</button></div>
+      <div class="opt-row"><span class="k">배경 어둡게</span><input type="range" id="darkRange" min="0" max="70" value="0"></div>
+
+      <button class="ghost" id="resetBtn">처음 상태로 되돌리기</button>
+    </div>
+  </details>
+
+  <p class="note">입력 내용과 사진은 이 기기 안에서만 처리되며 어디로도 전송되지 않습니다.<br>저장한 이미지를 X 글쓰기 창에 직접 첨부해 주세요.</p>
+</div>
+
+<input type="file" accept="image/*" class="file-hidden" id="fileDreamA">
+<input type="file" accept="image/*" class="file-hidden" id="fileLeadA">
+<input type="file" accept="image/*" class="file-hidden" id="fileDreamB">
+<input type="file" accept="image/*" class="file-hidden" id="fileBg">
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  var DEFAULT_LEADS=[
+    {id:"xavier",ko:"심성훈",en:"Xavier",color:"#7AA5E0"},
+    {id:"zayne",ko:"이서언",en:"Zayne",color:"#3FA0A8"},
+    {id:"rafayel",ko:"기욱",en:"Rafayel",color:"#E36486"},
+    {id:"sylus",ko:"진운",en:"Sylus",color:"#B23A52"},
+    {id:"caleb",ko:"하우주",en:"Caleb",color:"#D98A4E"}
+  ];
+  var STARTER_A=["이름","나이","첫 만남","관계","서로의 호칭","한마디"];
+  var STARTER_B=["나이","키·몸무게","직업·소속","외형","성격","취향","말버릇·습관","트라우마·약점","테마곡","특징"];
+  var DRIM_DEFAULT="#9B8CE0";
+
+  var leads=JSON.parse(JSON.stringify(DEFAULT_LEADS));
+  var drimColor=DRIM_DEFAULT;
+  var activeLead=0, sym="✕", mode="B";
+
+  var $=function(id){return document.getElementById(id);};
+  function hexToRgb(h){h=h.replace("#","");if(h.length===3)h=h.split("").map(function(c){return c+c;}).join("");var n=parseInt(h,16);return (n>>16&255)+","+(n>>8&255)+","+(n&255);}
+  function setCardAccent(el,hex){ el.style.setProperty("--accent",hex); el.style.setProperty("--accent-rgb",hexToRgb(hex)); }
+  function setRootAccent(hex){ document.documentElement.style.setProperty("--accent",hex); document.documentElement.style.setProperty("--accent-rgb",hexToRgb(hex)); }
+
+  /* ---------- generic fields ---------- */
+  function makeField(label,val,onChange){
+    var f=document.createElement("div"); f.className="field";
+    f.innerHTML='<span class="f-label" contenteditable="true" data-ph="항목" spellcheck="false"></span>'+
+                '<span class="f-val" contenteditable="true" data-ph="입력" spellcheck="false"></span>'+
+                '<button class="f-del no-export" title="삭제">✕</button>';
+    f.querySelector(".f-label").textContent=label||"";
+    f.querySelector(".f-val").textContent=val||"";
+    f.querySelector(".f-del").addEventListener("click",function(){ f.parentNode.removeChild(f); if(onChange)onChange(); });
+    return f;
+  }
+  function renderFields(boxId,list,onChange){ var box=$(boxId); box.innerHTML=""; list.forEach(function(l){ box.appendChild(makeField(l,"",onChange)); }); }
+
+  /* ---------- MODE A ---------- */
+  function renderLeadBar(){
+    var bar=$("leadbar"); bar.innerHTML="";
+    leads.forEach(function(L,i){
+      var b=document.createElement("button"); b.className="lead-pill"; b.setAttribute("role","tab");
+      b.setAttribute("aria-selected", i===activeLead?"true":"false");
+      b.innerHTML='<span class="dot" style="background:'+L.color+'"></span>'+L.ko+' <small>'+L.en+'</small>';
+      b.addEventListener("click",function(){ selectLead(i); }); bar.appendChild(b);
+    });
+  }
+  function selectLead(i){ activeLead=i; setCardAccent($("cardA"),leads[i].color); $("leadNameA").textContent=leads[i].ko; $("ebLeadA").textContent=leads[i].en; renderLeadBar(); }
+  function setSym(s){ sym=s; $("symMidA").textContent=s; $("ebSymA").textContent=s;
+    Array.prototype.forEach.call($("symSeg").children,function(btn){ btn.setAttribute("aria-pressed",btn.dataset.sym===s?"true":"false"); }); }
+  Array.prototype.forEach.call($("symSeg").children,function(btn){ btn.addEventListener("click",function(){ setSym(btn.dataset.sym); }); });
+  $("addFieldA").addEventListener("click",function(){ var f=makeField("","",null); $("fieldsA").appendChild(f); f.querySelector(".f-label").focus(); });
+
+  /* ---------- MODE B ---------- */
+  function renderRel(){
+    var box=$("relB"); box.innerHTML="";
+    leads.forEach(function(L,i){
+      var row=document.createElement("div"); row.className="rel-row";
+      var chip=document.createElement("span"); chip.className="rel-chip"; chip.setAttribute("contenteditable","true"); chip.setAttribute("spellcheck","false");
+      chip.textContent=L.ko; chip.dataset.lead=i; chip.style.background="rgba("+hexToRgb(L.color)+",0.92)";
+      var desc=document.createElement("span"); desc.className="rel-desc"; desc.setAttribute("contenteditable","true"); desc.setAttribute("spellcheck","false"); desc.setAttribute("data-ph","관계 서술");
+      row.appendChild(chip); row.appendChild(desc); box.appendChild(row);
+    });
+  }
+  function refreshChipColors(){ Array.prototype.forEach.call(document.querySelectorAll("#relB .rel-chip"),function(chip){ var i=+chip.dataset.lead; chip.style.background="rgba("+hexToRgb(leads[i].color)+",0.92)"; }); }
+  $("addFieldB").addEventListener("click",function(){ var f=makeField("","",fitB); $("fieldsB").appendChild(f); f.querySelector(".f-label").focus(); fitB(); });
+
+  /* ---------- color settings ---------- */
+  function renderColorList(){
+    var box=$("colorList"); box.innerHTML="";
+    leads.forEach(function(L,i){
+      var row=document.createElement("div"); row.className="color-row";
+      row.innerHTML='<span class="nm">'+L.ko+' <small>'+L.en+'</small></span>';
+      var inp=document.createElement("input"); inp.type="color"; inp.value=L.color;
+      inp.addEventListener("input",function(){ leads[i].color=inp.value; if(i===activeLead) setCardAccent($("cardA"),inp.value); refreshChipColors(); renderLeadBar(); });
+      row.appendChild(inp); box.appendChild(row);
+    });
+  }
+  $("drimColor").addEventListener("input",function(){ drimColor=this.value; setRootAccent(drimColor); setCardAccent($("cardB"),drimColor); });
+
+  /* ---------- images (shared bg) ---------- */
+  function readImage(input,cb){ var f=input.files&&input.files[0]; if(!f)return; var r=new FileReader(); r.onload=function(){cb(r.result);}; r.readAsDataURL(f); input.value=""; }
+  function hidePh(av){ var p=av.querySelector(".ph"); if(p)p.style.display="none"; }
+  function showPh(av){ var p=av.querySelector(".ph"); if(p)p.style.display=""; }
+  $("avDreamA").addEventListener("click",function(){ $("fileDreamA").click(); });
+  $("avLeadA").addEventListener("click",function(){ $("fileLeadA").click(); });
+  $("avDreamB").addEventListener("click",function(){ $("fileDreamB").click(); });
+  $("bgAddBtn").addEventListener("click",function(){ $("fileBg").click(); });
+  $("fileDreamA").addEventListener("change",function(){ readImage(this,function(d){ $("avDreamA").style.backgroundImage="url('"+d+"')"; hidePh($("avDreamA")); }); });
+  $("fileLeadA").addEventListener("change",function(){ readImage(this,function(d){ $("avLeadA").style.backgroundImage="url('"+d+"')"; hidePh($("avLeadA")); }); });
+  $("fileDreamB").addEventListener("change",function(){ readImage(this,function(d){ $("avDreamB").style.backgroundImage="url('"+d+"')"; hidePh($("avDreamB")); fitB(); }); });
+  $("fileBg").addEventListener("change",function(){ readImage(this,function(d){ $("cardBgA").style.backgroundImage="url('"+d+"')"; $("cardBgB").style.backgroundImage="url('"+d+"')"; }); });
+  $("bgClearBtn").addEventListener("click",function(){ $("cardBgA").style.backgroundImage="none"; $("cardBgB").style.backgroundImage="none"; });
+  $("darkRange").addEventListener("input",function(){ var o=this.value/100; $("cardDarkA").style.opacity=o; $("cardDarkB").style.opacity=o; });
+
+  /* ---------- auto-fit (mode B) ---------- */
+  var fitRAF=null;
+  function fitB(){
+    if(mode!=="B") return;
+    if(fitRAF) cancelAnimationFrame(fitRAF);
+    fitRAF=requestAnimationFrame(function(){
+      var el=$("cardInnerB"); var fs=1.06,min=0.6,guard=0; el.style.setProperty("--fs",fs);
+      while(el.scrollHeight>el.clientHeight+1 && fs>min && guard<80){ fs-=0.02; el.style.setProperty("--fs",fs.toFixed(3)); guard++; }
+    });
+  }
+  var fitTimer=null;
+  $("cardInnerB").addEventListener("input",function(){ clearTimeout(fitTimer); fitTimer=setTimeout(fitB,140); });
+  window.addEventListener("resize",fitB);
+
+  /* ---------- mode toggle ---------- */
+  function setMode(m){
+    mode=m;
+    $("modeA").classList.toggle("active",m==="A");
+    $("modeB").classList.toggle("active",m==="B");
+    $("tabA").setAttribute("aria-pressed",m==="A"?"true":"false");
+    $("tabB").setAttribute("aria-pressed",m==="B"?"true":"false");
+    if(m==="B") fitB();
+  }
+  $("tabA").addEventListener("click",function(){ setMode("A"); });
+  $("tabB").addEventListener("click",function(){ setMode("B"); });
+
+  /* ---------- export ---------- */
+  function toast(msg){ var t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(function(){t.classList.remove("show");},2800); }
+  function activeCard(){ return mode==="A"?$("cardA"):$("cardB"); }
+  function activeName(){ return ((mode==="A"?$("dreamNameA"):$("dreamNameB")).textContent||"드림주").trim(); }
+  function capture(){
+    if(mode==="B") fitB();
+    return (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve())
+      .then(function(){ return new Promise(function(res){ requestAnimationFrame(function(){ requestAnimationFrame(res); }); }); })
+      .then(function(){ return html2canvas(activeCard(),{ scale:Math.min(3,(window.devicePixelRatio||1)*2), backgroundColor:null, useCORS:true, logging:false, onclone:function(doc){ doc.body.classList.add("exporting"); } }); });
+  }
+  function fname(){ var n=activeName().replace(/\s+/g,"_"); return mode==="A" ? n+"_x_"+leads[activeLead].en+".png" : n+"_드림주.png"; }
+  function dl(c){ var a=document.createElement("a"); a.download=fname(); a.href=c.toDataURL("image/png"); document.body.appendChild(a); a.click(); document.body.removeChild(a); }
+
+  $("saveBtn").addEventListener("click",function(){ var b=this; b.disabled=true; b.style.filter="brightness(.8)";
+    capture().then(function(c){ dl(c); toast("이미지를 저장했어요."); }).catch(function(e){ console.error(e); toast("저장에 실패했어요. 다시 시도해 주세요."); }).then(function(){ b.disabled=false; b.style.filter=""; }); });
+  $("shareBtn").addEventListener("click",function(){ var b=this; b.disabled=true;
+    var n=activeName();
+    var text = mode==="A" ? (n+" "+sym+" "+leads[activeLead].ko+"\n#러브앤딥스페이스 #럽딥 #드림주 #페어틀")
+                          : (n+" 드림주 설정\n#러브앤딥스페이스 #럽딥 #드림주 #드림설정");
+    capture().then(function(c){ dl(c); toast("이미지 저장 완료! X 글쓰기 창에 사진을 첨부해 주세요."); setTimeout(function(){ window.open("https://x.com/intent/post?text="+encodeURIComponent(text),"_blank"); },700); })
+      .catch(function(e){ console.error(e); toast("문제가 생겼어요. 다시 시도해 주세요."); }).then(function(){ b.disabled=false; }); });
+
+  /* ---------- reset ---------- */
+  $("resetBtn").addEventListener("click",function(){
+    if(!confirm("입력 내용·사진·색을 모두 처음 상태로 되돌릴까요?")) return;
+    leads=JSON.parse(JSON.stringify(DEFAULT_LEADS)); drimColor=DRIM_DEFAULT; activeLead=0; setSym("✕");
+    ["avDreamA","avLeadA","avDreamB"].forEach(function(id){ $(id).style.backgroundImage="none"; showPh($(id)); });
+    $("cardBgA").style.backgroundImage="none"; $("cardBgB").style.backgroundImage="none";
+    $("cardDarkA").style.opacity=0; $("cardDarkB").style.opacity=0; $("darkRange").value=0;
+    $("dreamNameA").textContent=""; $("cardSubA").textContent=""; $("dreamNameB").textContent=""; $("taglineB").textContent="";
+    $("drimColor").value=DRIM_DEFAULT;
+    setRootAccent(drimColor); setCardAccent($("cardB"),drimColor); setCardAccent($("cardA"),leads[0].color);
+    renderFields("fieldsA",STARTER_A,null); renderFields("fieldsB",STARTER_B,fitB); renderRel(); renderColorList(); renderLeadBar();
+    $("leadNameA").textContent=leads[0].ko; $("ebLeadA").textContent=leads[0].en;
+    fitB();
+  });
+
+  /* ---------- init ---------- */
+  setRootAccent(drimColor);
+  setCardAccent($("cardB"),drimColor);
+  setCardAccent($("cardA"),leads[0].color);
+  $("leadNameA").textContent=leads[0].ko; $("ebLeadA").textContent=leads[0].en;
+  renderFields("fieldsA",STARTER_A,null);
+  renderFields("fieldsB",STARTER_B,fitB);
+  renderRel(); renderColorList(); renderLeadBar(); setSym("✕");
+  setMode("B");
+})();
+</script>
+</body>
+</html>
